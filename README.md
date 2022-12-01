@@ -8,13 +8,13 @@ To use the automatic input fetching, you need to set up a file called `SESSION` 
 Use this to download the data for the day and set up the solution file.
 
 ```
-python daily_setup.py <year> <day>
+python load_sleigh.py <year> <day>
 ```
 
 Write your answers in the `solution_the_first` and `solution_the_second` functions in the file created for the current date in `solutions/`. Then run
 
 ```
-python daily_run.py <year> <day>
+python ho_ho_hack.py <year> <day>
 ```
 
 The two answers should print to the terminal, which you can paste into the submission box.
