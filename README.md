@@ -11,10 +11,10 @@ Use this to download the data for the day and set up the solution file.
 python daily_setup.py <year> <day>
 ```
 
-Write your answer in the `solution` function in the file created for the current date in `solutions/`. Then run
+Write your answers in the `solution_the_first` and `solution_the_second` functions in the file created for the current date in `solutions/`. Then run
 
 ```
 python daily_run.py <year> <day>
 ```
 
-The answer should print to the terminal, which you can paste into the submission box.
+The two answers should print to the terminal, which you can paste into the submission box.
