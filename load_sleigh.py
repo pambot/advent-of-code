@@ -8,6 +8,7 @@ def fetch_input_data(year, day):
         session = f.read().strip()
     response = requests.get(
         f"https://adventofcode.com/{year}/day/{day}/input",
+        headers={"User-Agent": "github.com/pambot/advent-of-code"},
         cookies={"session": session}
     )
     filename = f"data/{year}/{day:02d}.txt"
