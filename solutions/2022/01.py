@@ -1,31 +1,15 @@
 
 def solution_the_first(data):
-    food = data.splitlines()
-    elf_bags = list()
-    bag = list()
-    for f in food:
-        if f:
-            bag.append(int(f))
-        else:
-            elf_bags.append(bag)
-            bag = list()
-
-    elf_sums = [sum(e) for e in elf_bags]
+    str_bags = [d.split("\n") for d in data.split("\n\n")]
+    elf_bags = [[int(n) for n in sb if n] for sb in str_bags]
+    elf_sums = [sum(cb) for cb in elf_bags]
     return max(elf_sums)
 
 
 def solution_the_second(data):
-    food = data.splitlines()
-    elf_bags = list()
-    bag = list()
-    for f in food:
-        if f:
-            bag.append(int(f))
-        else:
-            elf_bags.append(bag)
-            bag = list()
-
-    elf_sums = [sum(e) for e in elf_bags]
+    str_bags = [d.split("\n") for d in data.split("\n\n")]
+    elf_bags = [[int(n) for n in sb if n] for sb in str_bags]
+    elf_sums = [sum(cb) for cb in elf_bags]
 
     elf_maxes = []
     for n in range(3):
