@@ -20,11 +20,11 @@ def fetch_input_data(year, day):
 
 def make_solution_file(year, day):
     solution_template = f"""
-def solution_the_first(data):
+def first_star(data):
     return "first answer goes here"
 
 
-def solution_the_second(data):
+def second_star(data):
     return "second answer goes here"
 
 
@@ -32,8 +32,8 @@ if __name__ == "__main__":
     with open(f"data/{year}/{day:02d}.txt", "r") as f:
         data = f.read()
 
-    print(solution_the_first(data))
-    print(solution_the_second(data))"""
+    print(first_star(data))
+    print(second_star(data))"""
 
     filename = f"solutions/{year}/{day:02d}.py"
     if not os.path.exists(filename):

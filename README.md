@@ -11,7 +11,7 @@ Use this to download the data for the day and set up the solution file.
 python load_sleigh.py <year> <day>
 ```
 
-Write your answers in the `solution_the_first` and `solution_the_second` functions in the file created for the current date in `solutions/`. Then run
+Write your answers in the `first_star` and `second_star` functions in the file created for the current date in `solutions/`. Then run
 
 ```
 python ho_ho_hack.py <year> <day>
