@@ -1,6 +1,5 @@
 import re
 import functools
-import itertools
 import networkx as nx
 
 
@@ -38,6 +37,31 @@ def make_valve_graph(G, start_node):
     return V
 
 
+def single_path2flows(V, start_node, total_time):
+    visited = tuple()
+    time_cost = 0
+    start_flow = V.nodes[start_node]["flow_rate"]
+    path_cache = dict()
+    single_dfs(V, start_node, visited, time_cost, start_flow, total_time, path_cache)
+    return max(path_cache.values())
+
+
+def single_dfs(V, curr_node, visited, time_cost, flow_rate, total_time, path_cache):
+    visited += (curr_node,)
+    time_left = total_time - time_cost
+    if time_left <= 0:
+        return
+
+    flow_rate += V.nodes[curr_node]["flow_rate"] * time_left
+    path_cache[visited] = flow_rate
+
+    for node in V.neighbors(curr_node):
+        if node not in visited:
+            next_time_cost = time_cost + V[curr_node][node]["time_cost"] + 1
+            single_dfs(V, node, visited, next_time_cost, flow_rate, total_time, path_cache)
+    return
+
+
 def first_star(data):
     regex_extract = parse_input(data)
     start_node = "AA"
@@ -45,22 +69,108 @@ def first_star(data):
     G = make_full_graph(regex_extract)
     V = make_valve_graph(G, start_node)
 
-    path_cache = dict()
-    total_time = 30
-    @functools.lru_cache(maxsize=None)
-    def dfs(G, curr_node, visited, time_cost, flow_rate):
-        visited += (curr_node,)
-        if curr_node != start_node:
-            time_cost += V[visited[-2]][curr_node]["time_cost"] + 1
-        flow_rate += (total_time - time_cost) * V.nodes[curr_node]["flow_rate"]
-        for node in G.neighbors(curr_node):
-            if node not in visited and time_cost <= total_time:
-                dfs(G, node, visited, time_cost, flow_rate)
-        path_cache[visited] = dict(time_cost=time_cost, flow_rate=flow_rate)
+    return single_path2flows(V, start_node, 30)
 
-    initial_flow = V.nodes[start_node]["flow_rate"]
-    dfs(V, start_node, (), 0, initial_flow)
-    return max([v["flow_rate"] for _, v in path_cache.items()])
+
+PATH_CACHE = dict()
+
+
+def double_path2flows(V, start_node, total_time):
+    me_visited = tuple()
+    el_visited = tuple()
+    time_cost = 0
+    start_flow = V.nodes[start_node]["flow_rate"]
+    double_dfs(
+        V,
+        me_visited, el_visited,
+        start_node, start_node,
+        time_cost, time_cost,
+        start_flow,
+        total_time
+    )
+    return max(PATH_CACHE.values())
+
+
+@functools.lru_cache(maxsize=None)
+def double_dfs(
+    V,
+    me_visited, el_visited,
+    me_curr_node, el_curr_node,
+    me_time_cost, el_time_cost,
+    flow_rate,
+    total_time
+):
+    # compute cost of this next step (up front), time stops if not moving
+    if me_visited and me_curr_node:
+        me_time_cost += V[me_visited[-1]][me_curr_node]["time_cost"] + 1
+
+    if el_visited and el_curr_node:
+        el_time_cost += V[el_visited[-1]][el_curr_node]["time_cost"] + 1
+
+    me_time_left = total_time - me_time_cost
+    el_time_left = total_time - el_time_cost
+
+    # if neither has time left, exit
+    if me_time_left < 0 and el_time_left < 0:
+        return
+
+    # if one has time left, just use that one, other will be 0
+    if me_time_left >= 0:
+        me_visited += (me_curr_node,)
+        me_flow_rate = V.nodes[me_curr_node]["flow_rate"] * me_time_left
+    else:
+        me_flow_rate = 0
+
+    if el_time_left >= 0:
+        el_visited += (el_curr_node,)
+        el_flow_rate = V.nodes[el_curr_node]["flow_rate"] * el_time_left
+    else:
+        el_flow_rate = 0
+
+    flow_rate += me_flow_rate + el_flow_rate
+
+    global PATH_CACHE
+    PATH_CACHE[tuple(sorted((me_visited, el_visited)))] = flow_rate
+
+    if me_time_left >= 0 and el_time_left >= 0:
+        for me_node in V.neighbors(me_curr_node):
+            for el_node in V.neighbors(el_curr_node):
+                if (
+                    me_node != el_node and
+                    me_node not in me_visited + el_visited and
+                    el_node not in me_visited + el_visited
+                ):
+                    double_dfs(
+                        V,
+                        me_visited, el_visited,
+                        me_node, el_node, # proposed visit, rest is present iteration
+                        me_time_cost, el_time_cost,
+                        flow_rate,
+                        total_time
+                    )
+    elif me_time_left < 0 and el_time_left >= 0:
+        for el_node in V.neighbors(el_curr_node):
+            if el_node not in me_visited + el_visited:
+                double_dfs(
+                    V,
+                    me_visited, el_visited,
+                    None, el_node,
+                    me_time_cost, el_time_cost,
+                    flow_rate,
+                    total_time
+                )
+    elif me_time_left >= 0 and el_time_left < 0:
+        for me_node in V.neighbors(me_curr_node):
+            if me_node not in me_visited + el_visited:
+                double_dfs(
+                    V,
+                    me_visited, el_visited,
+                    me_node, None,
+                    me_time_cost, el_time_cost,
+                    flow_rate,
+                    total_time
+                )
+    return
 
 
 def second_star(data):
@@ -70,39 +180,7 @@ def second_star(data):
     G = make_full_graph(regex_extract)
     V = make_valve_graph(G, start_node)
 
-    path_cache = dict()
-    me_total_time = 26
-    el_total_time = 26
-    @functools.lru_cache(maxsize=None)
-    def double_dfs(
-        G, me_node, el_node, me_visited, el_visited,
-        me_time_cost, el_time_cost, flow_rate
-    ):
-        me_visited += (me_node,)
-        el_visited += (el_node,)
-        visited = me_visited + el_visited
-        if me_node != start_node and el_node != start_node:
-            me_time_cost += V[me_visited[-2]][me_node]["time_cost"] + 1
-            el_time_cost += V[el_visited[-2]][el_node]["time_cost"] + 1
-        flow_rate += (me_total_time - me_time_cost) * V.nodes[me_node]["flow_rate"]
-        flow_rate += (el_total_time - el_time_cost) * V.nodes[el_node]["flow_rate"]
-        next_me_nodes = list(set(G.neighbors(me_node)) - set(visited))
-        next_el_nodes = list(set(G.neighbors(el_node)) - set(visited))
-        for next_me_node, next_el_node in itertools.product(next_me_nodes, next_el_nodes):
-            if (
-                next_me_node != next_el_node and
-                me_time_cost <= me_total_time and el_time_cost <= el_total_time
-            ):
-                double_dfs(
-                    G, next_me_node, next_el_node, me_visited, el_visited,
-                    me_time_cost, el_time_cost, flow_rate
-                )
-        path_cache[(me_visited, el_visited)] = dict(
-            me_time_cost=me_time_cost, el_time_cost=el_time_cost, flow_rate=flow_rate
-        )
-    initial_flow = V.nodes[start_node]["flow_rate"]
-    double_dfs(V, start_node, start_node, (), (), 0, 0, initial_flow)
-    return max([v["flow_rate"] for _, v in path_cache.items()])
+    return double_path2flows(V, start_node, 26)
 
 
 if __name__ == "__main__":
@@ -121,4 +199,11 @@ Valve II has flow rate=0; tunnels lead to valves AA, JJ
 Valve JJ has flow rate=21; tunnel leads to valve II"""
 
     print(first_star(data))
+
+
+    #     example = """Valve AA has flow rate=0; tunnels lead to valves BB, CC
+    # Valve BB has flow rate=1; tunnels lead to valve AA
+    # Valve CC has flow rate=1; tunnels lead to valve AA, DD
+    # Valve DD has flow rate=1; tunnels lead to valve CC, EE
+    # Valve EE has flow rate=1; tunnels lead to valve DD"""
     print(second_star(data))
