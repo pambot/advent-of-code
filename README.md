@@ -14,7 +14,7 @@ python load_sleigh.py <year> <day>
 Write your answers in the `first_star` and `second_star` functions in the file created for the current date in `solutions/`. Then run
 
 ```
-python ho_ho_hack.py <year> <day>
+python jingle_jangle.py <year> <day>
 ```
 
 The two answers should print to the terminal, which you can paste into the submission box.
