@@ -115,6 +115,10 @@ if __name__ == "__main__":
     with open(f"data/2023/09.txt", "r") as f:
         data = f.read()
 
+    #     data = """0 3 6 9 12 15
+    # 1 3 6 10 15 21
+    # 10 13 16 21 30 45"""
+
     print(first_star(data))
     print(stars_with_lagrangian(data))
     print(second_star(data))

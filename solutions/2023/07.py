@@ -80,5 +80,11 @@ if __name__ == "__main__":
     with open(f"data/2023/07.txt", "r") as f:
         data = f.read()
 
+    #     data = """32T3K 765
+    # T55J5 684
+    # KK677 28
+    # KTJJT 220
+    # QQQJA 483"""
+
     print(first_star(data))
     print(second_star(data))

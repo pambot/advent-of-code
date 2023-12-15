@@ -51,5 +51,19 @@ if __name__ == "__main__":
     with open(f"data/2023/01.txt", "r") as f:
         data = f.read()
 
+    #     data = """1abc2
+    # pqr3stu8vwx
+    # a1b2c3d4e5f
+    # treb7uchet"""
+
     print(first_star(data))
+
+    #     data = """two1nine
+    # eightwothree
+    # abcone2threexyz
+    # xtwone3four
+    # 4nineeightseven2
+    # zoneight234
+    # 7pqrstsixteen"""
+
     print(second_star(data))

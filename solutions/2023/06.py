@@ -46,5 +46,8 @@ if __name__ == "__main__":
     with open(f"data/2023/06.txt", "r") as f:
         data = f.read()
 
+    #     data = """Time:      7  15   30
+    # Distance:  9  40  200"""
+
     print(first_star(data))
     print(second_star(data))

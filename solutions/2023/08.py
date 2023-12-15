@@ -59,6 +59,16 @@ if __name__ == "__main__":
     with open(f"data/2023/08.txt", "r") as f:
         data = f.read()
 
+    #     data = """RL
+
+    # AAA = (BBB, CCC)
+    # BBB = (DDD, EEE)
+    # CCC = (ZZZ, GGG)
+    # DDD = (DDD, DDD)
+    # EEE = (EEE, EEE)
+    # GGG = (GGG, GGG)
+    # ZZZ = (ZZZ, ZZZ)"""
+
     print(first_star(data))
 
     #     data = """LR
