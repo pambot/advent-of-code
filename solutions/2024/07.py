@@ -1,0 +1,67 @@
+from operator import add, mul
+from itertools import product
+
+
+def parse(data):
+    v = [
+        tuple(map(int, d.replace(":", "").split(" ")))
+        for d in data.strip().split("\n")
+    ]
+    return [(n[0], n[1:]) for n in v]
+
+
+def first_star(data):
+    nums = parse(data)
+    total = 0
+    for ans, num in nums:
+        permute_ops = list(product([add, mul], repeat=len(num) - 1))
+        val = num[0]
+        for ops in permute_ops:
+            for nu, op in zip(num[1:], ops):
+                val = op(val, nu)
+                if val > ans:
+                    break
+            if val == ans:
+                total += ans
+                break
+            val = num[0]
+    return total
+
+
+def cat(a, b):
+    return int(str(a) + str(b))
+
+
+def second_star(data):
+    nums = parse(data)
+    total = 0
+    for ans, num in nums:
+        permute_ops = list(product([add, mul, cat], repeat=len(num) - 1))
+        val = num[0]
+        for ops in permute_ops:
+            for nu, op in zip(num[1:], ops):
+                val = op(val, nu)
+                if val > ans:
+                    break
+            if val == ans:
+                total += ans
+                break
+            val = num[0]
+    return total
+
+
+if __name__ == "__main__":
+    with open(f"data/2024/07.txt", "r") as f:
+        data = f.read()
+        #         data = """190: 10 19
+        # 3267: 81 40 27
+        # 83: 17 5
+        # 156: 15 6
+        # 7290: 6 8 6 15
+        # 161011: 16 10 13
+        # 192: 17 8 14
+        # 21037: 9 7 18 13
+        # 292: 11 6 16 20"""
+
+    print(first_star(data))
+    print(second_star(data))
