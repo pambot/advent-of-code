@@ -19,21 +19,30 @@ def fetch_input_data(year, day):
 
 
 def make_solution_file(year, day):
-    solution_template = f"""
+    solution_template = f'''
+def parse(data):
+    return data.strip().split("\n")
+
+
 def first_star(data):
+    parse(data)
     return "first answer goes here"
 
 
 def second_star(data):
+    parse(data)
     return "second answer goes here"
 
 
 if __name__ == "__main__":
     with open(f"data/{year}/{day:02d}.txt", "r") as f:
         data = f.read()
+        data = """
+
+"""
 
     print(first_star(data))
-    print(second_star(data))"""
+    print(second_star(data))'''
 
     filename = f"solutions/{year}/{day:02d}.py"
     if not os.path.exists(filename):
