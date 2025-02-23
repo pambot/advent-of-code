@@ -21,7 +21,7 @@ def fetch_input_data(year, day):
 def make_solution_file(year, day):
     solution_template = f'''
 def parse(data):
-    return data.strip().split("\n")
+    return data.strip().split("\\n")
 
 
 def first_star(data):
